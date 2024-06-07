@@ -1,0 +1,30 @@
+-- Crea una funcion para devolver las ventas por tienda, pasandole dos parametros entre las dos fechas que queremos
+-- calcular las ventas
+-- Esta funcion devolvera el nombre de la tienda, el nombre del producto, la cantidad vendida y el total recaudado por cada producto.
+
+CREATE FUNCTION InformeVentasPorTienda (@fechaInicio DATE, @fechaFin DATE)
+RETURNS TABLE
+AS
+RETURN
+(
+    SELECT t.nombre AS NombreTienda,p.nombre AS NombreProducto,SUM(pp.cantidad) AS CantidadVendida,SUM(pp.cantidad * pr.precio) AS TotalRecaudado
+    FROM pedidoProducto pp
+    JOIN pedido p ON pp.idPedido = p.id
+    JOIN producto pr ON pp.idProducto = pr.id
+    JOIN tienda t ON p.idEmpleado = e.idTienda
+    JOIN empleado e ON p.idEmpleado = e.id
+    WHERE p.fecha BETWEEN @fechaInicio AND @fechaFin
+    GROUP BY t.nombre, pr.nombre
+    ORDER BY t.nombre, pr.nombre
+);
+
+
+-- Realiza un procedimiento para insertar un cliente con  su nombre, genero, direccion, telefono y fechaNc
+
+CREATE PROCEDURE InsertarCliente @Nombre NVARCHAR(80), @Genero BIT, @Direccion NVARCHAR(100), 
+	@Telefono NVARCHAR(9), @FechaNac DATE
+AS
+BEGIN
+    INSERT INTO cliente (nombre, genero, direccion, telefono, fechaNac)
+    VALUES (@Nombre, @Genero, @Direccion, @Telefono, @FechaNac);
+END;
